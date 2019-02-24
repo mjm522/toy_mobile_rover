@@ -1,0 +1,35 @@
+# ASCENT Robotics - Code Asignment - Sensor System
+
+In this project you will be implementing a (very simple) simulated sensor system. You will need to come up with a few different types of sensors, create a prototype of them and build a system using them.
+
+## 1 Sensor System Implementation
+
+Expected implementation time: 2-4 hours
+
+A robot moving in the real world processes a vast amount of sensory information. You need to create a simple, abstract robot system with its abstract sensor loadout and perform some kind of runtime test (or task) with this system.
+
+Feel free to forget about the robotics and control parts of this problem, this is a pure software engineering assignment. Come up with a framework that is extendable and maintainable and has the potential to handle several sensor models connected into a network.
+
+There is no need for visualization and there is also no need to collect real data (but you can
+do it if you would like to).
+
+### Requirements
+
+    • Create a simple sensory framework or platform
+    • Create several dummy sensors (at least a few di↵erent types)
+    • Create a run environment that starts the platform and the sensors
+    • Send some data between the sensors or between the sensor and the platform or both
+    (no need to process data)
+    • Come up with a run test that demonstrates data flowing through the system (for
+    example via logs or status messages or maybe visualization)
+    • Bonus points if you make the whole system runtime configurable
+
+### Notes
+
+Your submission doesn’t have to be super complicated! Feel free to use any existing libraries but it is also encouraged to create your (simple) framework from scratch. Also, your ”sensors” can be arbitrary, made-up, abstract models - no need to mimic existing sensors or datatypes. This more about principles and design and not about real world simulation.
+
+## 2 Submission
+
+### Compilation and running instructions
+
+Since this is an open ended task and you can come up with all kinds of things, be sure to take extra care providing us with usage instructions. If we will not be able to run your code or reproduce your results, that will shine a bad light on you.
