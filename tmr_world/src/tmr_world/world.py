@@ -259,8 +259,6 @@ class World():
 
         while not self._done:
 
-            self.on_exit()
-
             self._display_screen.fill(self._bg_color)
 
             self.key_board_menu_control()

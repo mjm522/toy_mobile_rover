@@ -31,7 +31,7 @@ class Ultrasonic(Sensors):
         assert len(self._obstacle_lines_starts) == len(self._obstacle_lines_ends)
 
 
-    def update(self, world_state):
+    def update(self):
         """
         Update the value of the sensors d
         for reading. It takes in input from the world state and depending on 
