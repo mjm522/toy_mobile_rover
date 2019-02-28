@@ -25,7 +25,7 @@ class Rover():
 
         self._ultra_sonic = Ultrasonic(robot_interface=self._robot, config=ULTRASONIC_CONFIG)
 
-    def command_robot(self, u, world_state=None):
+    def command_robot(self, u):
         """
         The function that sends commnads to the robto
         inputs : u = control commands of the left and right wheel
@@ -35,7 +35,7 @@ class Rover():
 
         self._encoder.update()
 
-        self._ultra_sonic.update(world_state)
+        self._ultra_sonic.update()
 
         return true_state
 
