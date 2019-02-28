@@ -33,3 +33,24 @@ Your submission doesn’t have to be super complicated! Feel free to use any exi
 ### Compilation and running instructions
 
 Since this is an open ended task and you can come up with all kinds of things, be sure to take extra care providing us with usage instructions. If we will not be able to run your code or reproduce your results, that will shine a bad light on you.
+
+## 3 Setup instructions
+
+    Run $./install_dependencies.sh
+
+    Now we need to setup the PYTHONPATH. The modules of the library can be installed, but for the testing, just source the following file.
+
+    Run $source setup_tmr.bash
+
+    The mobile rover seen can be controlled using the arrow keys.
+
+    At present, two sensors are implemented, scaling this platform up is quite trivial.
+
+    To change parameters of the sensors, change values in tmr_sensors>src>tmr_sensors>encoder>config
+
+    To change parameters of the sensors, change values in tmr_sensors>src>tmr_sensors>ultrsonic>config
+
+### To Fix
+    
+    The gui needs to be fixed for making the config file run time configurable. 
+
