@@ -34,7 +34,11 @@ Your submission doesn’t have to be super complicated! Feel free to use any exi
 
 Since this is an open ended task and you can come up with all kinds of things, be sure to take extra care providing us with usage instructions. If we will not be able to run your code or reproduce your results, that will shine a bad light on you.
 
-## 3 Setup instructions
+## 3 Brief Description
+
+The system in this file consists of a small toy robot in a world. The robot consists of two sensors, ultrasonic sensor and an encoder. Adding any more sensors is trivial by adding additional modules in the tmr_sensors>src>tmr_sensors. The robot moves in the world by using the arrow keys. The robots position is updated using Runge-Kutta 4rth order integration. The step size and the integral time constant can be modified by changing parameters in the tmr_robot>config file. The system currently loggs in values on the screen. 
+
+## 4 Setup instructions
 
     Run $./install_dependencies.sh
 
@@ -50,11 +54,15 @@ Since this is an open ended task and you can come up with all kinds of things, b
 
     To change parameters of the sensors, change values in tmr_sensors>src>tmr_sensors>ultrsonic>config
 
-### Optional steps
+### 5 Optional steps
 
     To generate documentation of the library install doxygen by type in doxygen doxygen_config_file
 
-### To Fix
+### 6 To Fix
     
     The gui needs to be fixed for making the config file run time configurable. 
+
+    To fix the collision detection
+
+    To add plotting windows on seperate threads to show the readings.
 
