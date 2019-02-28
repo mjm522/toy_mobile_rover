@@ -50,6 +50,10 @@ Since this is an open ended task and you can come up with all kinds of things, b
 
     To change parameters of the sensors, change values in tmr_sensors>src>tmr_sensors>ultrsonic>config
 
+### Optional steps
+
+    To generate documentation of the library install doxygen by type in doxygen doxygen_config_file
+
 ### To Fix
     
     The gui needs to be fixed for making the config file run time configurable. 
