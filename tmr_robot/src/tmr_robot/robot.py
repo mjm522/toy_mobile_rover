@@ -31,6 +31,9 @@ class Robot():
         assert self._wheel_r > 0.
         assert self._robot_d > 0.
         assert self._step_size >= self._dt
+        self._num_wheels=2
+        self._num_lasers=1
+        self._wheel_omgs = [0]*self._num_wheels
 
     def init_start(self, x0, y0, alpha0, t0=0):
         """
@@ -42,6 +45,23 @@ class Robot():
         """
         self._x = np.array([x0, y0, alpha0, 0., 0., 0.])
         self._t = t0
+
+
+    def stop(self):
+        self._x[3:] = np.zeros(3)
+
+
+    def wheel_omgs(self):
+        return np.asarray(self._wheel_omgs)
+
+
+    def robot_true_state(self):
+        return self._x.copy()
+
+    def compute_rot_mat(self):
+        rover_rot = np.array([ [np.cos(self._x[2]), -np.sin(self._x[2])], 
+                               [np.sin(self._x[2]),  np.cos(self._x[2])] ])
+        return rover_rot
  
     def kinematics(self, x, u):
         """
@@ -49,9 +69,17 @@ class Robot():
         u[0] = omega of right wheel
         u[1] = omeaga of left wheel
         """
+        #this assumption is right only since we don't have a controller on board
+        #and assumes the robot is able to instentaneoulsy set the the wheel velocity
+        #to the commanded effort
+        self._wheel_omgs = u
+
+        #right and left wheel linear velocity
         vel_r = u[0]*self._wheel_r
         vel_l = u[1]*self._wheel_r
+        #average forward velocity of the robot
         vel_avg = 0.5*(vel_r + vel_l)
+        #derivative of state the robot
         x3_dt = (u[0] - u[1])*(self._wheel_r/self._robot_d)
         x2_dt = vel_avg*np.sin(x[2]+x3_dt)*self._robot_d
         x1_dt = vel_avg*np.cos(x[2]+x3_dt)*self._robot_d
@@ -92,5 +120,7 @@ class Robot():
 
         self._t = 0
 
-        return self._x.copy()
+        self.compute_rot_mat()
+
+        return self.robot_true_state()
 

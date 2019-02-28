@@ -10,9 +10,13 @@ from tmr_sensors.encoder.config import ENCODER_CONFIG
 class TestRover(unittest.TestCase):
 
     def test(self):
+
         las = Laser(LASER_CONFIG)
+
         enc = Encoder(ENCODER_CONFIG)
+
         self.assertEqual(len(las.reading()), 6)
+        
         self.assertEqual(len(enc.reading() ), 6)
 
 

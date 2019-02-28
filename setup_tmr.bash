@@ -4,7 +4,7 @@ TMR_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export TMR_ROOT_DIR="${TMR_ROOT_DIR}"
 
-MODULES='tmr_robot/src tmr_rover/src tmr_sensors/src'
+MODULES='tmr_robot/src tmr_rover/src tmr_sensors/src tmr_world/src'
 
 for module in $MODULES
 do
