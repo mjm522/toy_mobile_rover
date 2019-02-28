@@ -46,6 +46,8 @@ The system in this file consists of a small toy robot in a world. The robot cons
 
     Run $source setup_tmr.bash
 
+    Check the demo by running, python demos/demo_rover.world.py
+
     The mobile rover seen can be controlled using the arrow keys.
 
     At present, two sensors are implemented, scaling this platform up is quite trivial.
