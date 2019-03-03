@@ -12,7 +12,7 @@ class Ultrasonic(Sensors):
 
         Sensors.__init__(self, robot_interface, config)
 
-        self._beam_radius = config['beam_radius']
+        self._beam_radius = config['params']['beam_radius']
 
         self.reset()
 

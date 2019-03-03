@@ -1,131 +1,138 @@
-#Tutorial : how to use ThorPy with a pre-existing code - step 1
-import pygame, thorpy
-
-DONE, CANCEL, CLICK_QUIT = thorpy.constants.LAUNCH_DONE, thorpy.constants.LAUNCH_CANCEL, thorpy.constants.LAUNCH_CLICK_QUIT
-
-pygame.init()
-pygame.key.set_repeat(300, 30)
-screen = pygame.display.set_mode((400,400))
-screen.fill((255,255,255))
-clock = pygame.time.Clock()
-
-pygame.display.flip()
-
-#declaration of some ThorPy elements ...
-
-encoder = thorpy.Clickable.make("Encoder")
-ultrasonic = thorpy.Clickable.make("Ultrasonic")
-
-en_inserter_res = thorpy.Inserter.make(name="Resolution ", value="0.5")
-en_inserter_range = thorpy.Inserter.make(name="Range ", value="1.")
-en_configure_box = thorpy.make_ok_cancel_box(elements=[en_inserter_res, en_inserter_range])
-
-us_inserter_res = thorpy.Inserter.make(name="Resolution ", value="0.5")
-us_inserter_range = thorpy.Inserter.make(name="Range ", value="1.")
-us_configure_box = thorpy.make_ok_cancel_box(elements=[us_inserter_res, us_inserter_range])
+import sys, time
+import threading
+from functools import partial
+from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtCore import QTimer, QRect
+from tmr_gui.configure_popup import ConfigurePopup
+from tmr_gui.embed_plot import EmbedPlot, Communicate
+from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QFrame, QGridLayout
 
 
-def us_res_reaction(event): #here is all the dynamics of the game
-    print event
-    value = us_inserter_res.get_value() #get text inserted by player
-    us_inserter_res.set_value(value) #wathever happens, we flush the inserter
-    us_inserter_res.unblit_and_reblit() #redraw inserter
-    try: #try to cast the inserted value as int number
-        guess = int(value)
-        print "guess \t", guess
-    except ValueError: #occurs for example when trying int("some text")
-        return
+class GUI(QWidget):
 
-def us_range_reaction(event): #here is all the dynamics of the game
-    print event
-    value = us_inserter_range.get_value() #get text inserted by player
-    us_inserter_range.set_value(value) #wathever happens, we flush the inserter
-    us_inserter_range.unblit_and_reblit() #redraw inserter
-    try: #try to cast the inserted value as int number
-        guess = int(value)
-        print "guess \t", guess
-    except ValueError: #occurs for example when trying int("some text")
-        return
+    def __init__(self, rover_world, rover_config):
 
-def en_res_reaction(event): #here is all the dynamics of the game
-    print event
-    value = en_inserter_res.get_value() #get text inserted by player
-    en_inserter_res.set_value(value) #wathever happens, we flush the inserter
-    en_inserter_res.unblit_and_reblit() #redraw inserter
-    try: #try to cast the inserted value as int number
-        guess = int(value)
-        print "guess \t", guess
-    except ValueError: #occurs for example when trying int("some text")
-        return
+        super().__init__()
+        
+        self._title = 'TMR Control Panel'
 
-def en_range_reaction(event): #here is all the dynamics of the game
-    print event
-    value = en_inserter_range.get_value() #get text inserted by player
-    en_inserter_range.set_value(value) #wathever happens, we flush the inserter
-    en_inserter_range.unblit_and_reblit() #redraw inserter
-    try: #try to cast the inserted value as int number
-        guess = int(value)
-        print "guess \t", guess
-    except ValueError: #occurs for example when trying int("some text")
-        return
+        self._left = 0
+        
+        self._top = 0
+        
+        self._width = 800
+        
+        self._height = 540
 
+        self._sensor_configs = [sensor.config() for sensor in rover_config['sensors']]
+        
+        self.init_ui()
+        
+        self.init_pygame(rover_world)
+ 
+    def init_ui(self):
+        
+        self.setWindowTitle(self._title)
+        
+        self.setGeometry(self._left, self._top, self._width, self._height)
 
-#We declare a Reaction reaction to THORPY_EVENTs with id EVENT_INSERT
-us_reaction_res = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
-                              reac_func=us_res_reaction,
-                              event_args={"id":thorpy.constants.EVENT_INSERT,
-                                           "el":us_inserter_res})
+        self._button = QPushButton('Configure', self)
+        
+        self._button.move(600, 100)
+        
+        self._button.clicked.connect(self.drop_down)
 
-us_reaction_range = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
-                              reac_func=us_range_reaction,
-                              event_args={"id":thorpy.constants.EVENT_INSERT,
-                                           "el":us_inserter_range})
+        self.init_plot()        
 
-en_reaction_res = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
-                              reac_func=en_res_reaction,
-                              event_args={"id":thorpy.constants.EVENT_INSERT,
-                                           "el":en_inserter_res})
+        self.show()
 
-en_reaction_range = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
-                              reac_func=en_range_reaction,
-                              event_args={"id":thorpy.constants.EVENT_INSERT,
-                                           "el":en_inserter_range})
+    def init_plot(self):
+
+        self._frame = QFrame(self)
+        
+        self._frame.setStyleSheet("QWidget { background-color: %s }" % QColor(210,210,235,255).name())
+        
+        self._layout = QGridLayout()
+        
+        self._frame.setLayout(self._layout)
+    
+        # Place the matplotlib figure
+        self._canvas = EmbedPlot()
+
+        self._layout.addWidget(self._canvas, *(0,1))
+
+        # data_loop = threading.Thread(name = 'tmr_data_loop', target=self._canvas.data_receiver, daemon = True, args = (self.plot_data,))
+        
+        # data_loop.start()
+
+    def plot_data(self, d):
+
+        self._canvas.add_data(d)
 
 
-us_configure_box.add_reaction(us_reaction_res)
-us_configure_box.add_reaction(us_reaction_range)
-en_configure_box.add_reaction(en_reaction_res)
-en_configure_box.add_reaction(en_reaction_range)
+    def drop_down(self):
 
-thorpy.set_launcher(encoder, en_configure_box)#, click_quit=True)
-thorpy.set_launcher(ultrasonic, us_configure_box)#, click_quit=True)
+        self._sensor_list = QComboBox(self)
 
-c_button = thorpy.make_button("Configure")
-c_button_box = thorpy.make_ok_cancel_box(elements=[encoder, ultrasonic])
-thorpy.set_launcher(c_button, c_button_box, click_quit=True)
+        for idx, sensor in enumerate(self._sensor_configs):
 
-q_button = thorpy.make_button("Quit", func=thorpy.functions.quit_func)
+            self._sensor_list.addItem(sensor['name'])
 
-background = thorpy.Box.make(elements=[c_button, q_button])
+        self._sensor_list.activated[str].connect(partial(self.pop_up, idx))
 
-thorpy.store(background)
+        self._sensor_list.move(self._width/2, self._height/2)
 
-menu = thorpy.Menu(background)
-#important : set the screen as surface for all elements
-for element in menu.get_population():
-    element.surface = screen
+        self._sensor_list.show()
 
-background.set_topleft((10,320))
-background.blit()
-background.update()
+    def pop_up(self, sensor_idx):
+        
+        self._sensor_config = ConfigurePopup(self, 0)
+
+        self._sensor_config.move(self._width/2, self._height/2)
+
+        self._sensor_config.show()
+
+        self._sensor_list.close()
+
+    def config_at_idx(self, idx):
+
+        return self._sensor_configs[idx]
+
+    def update_configs(self, vals, idx):
+        # print ("old", self._sensor_configs[idx])
+        self._sensor_configs[idx]['params'].update({k : vals[i] for i,k in enumerate(self._sensor_configs[idx]['params'].keys())})
+        # print ("updated", self._sensor_configs[idx])
+     
+    def init_pygame(self, rover_world):
+        
+        self._rover_world = rover_world
+
+        self._timer = QTimer()
+
+        self._timer.timeout.connect(self.pygame_loop)
+
+        self._timer.start(0)
+
+    def pygame_loop(self):
+
+        if self._rover_world.run(self, self.plot_data):
+
+            self.close()
 
 
-playing_game = True
-while playing_game:
-    clock.tick(45)
-    # print menu.get_population()
-    for event in pygame.event.get():
-        # background.blit()
-        menu.react(event) #the menu automatically integrate your elements
+# def dataSendLoop(addData_callbackFunc):
+#     # Setup the signal-slot mechanism.
+#     mySrc = Communicate()
+#     mySrc.data_signal.connect(addData_callbackFunc)
 
-pygame.quit()
+#     # Simulate some data
+#     n = np.linspace(0, 499, 500)
+#     y = 50 + 25*(np.sin(n / 8.3)) + 10*(np.sin(n / 7.5)) - 5*(np.sin(n / 1.5))
+#     i = 0
+
+#     while(True):
+#         if(i > 499):
+#             i = 0
+#         time.sleep(0.1)
+#         mySrc.data_signal.emit(y[i]) # <- Here you emit a signal!
+#         i += 1

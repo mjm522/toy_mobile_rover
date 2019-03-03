@@ -1,13 +1,14 @@
-import thorpy
+import os
+import copy
 import pygame
 import logging
 import numpy as np
-from sprites import Wall, Agent
+from tmr_world.sprites import Wall, Agent
 
 
 class World():
 
-    def __init__(self, rover_interface, config=None):
+    def __init__(self, rover_interface, config):
 
         self._fps = config['FPS']
 
@@ -48,7 +49,7 @@ class World():
         self.init_robot()
 
         self.init_keyboard_ctrl()
-        
+
 
     def init_keyboard_ctrl(self):
 
@@ -101,13 +102,39 @@ class World():
 
 
     def init_robot(self):
-        return
-        self._robot_sprite = Agent(self._robot_color,  70,  55)
 
-        self._all_sprites_list.add(self._robot_sprite)
+        # self._robot_sprite = Agent(self._robot_color,  70,  55)
 
+        # self._all_sprites_list.add(self._robot_sprite)
+
+        self._robot_surface = pygame.Surface((100,100))
+        
+        self._robot_surface.set_colorkey(self._bg_color)
+        
+        pygame.draw.circle(self._robot_surface, self._robot_color, (50, 50), 50)
+        
+        pygame.draw.polygon(self._robot_surface, (0,0,255), [[50,40],[50,60],[100,60],[100,40]], 2)
+
+        # self._robot_surface_rect = self._robot_surface.get_rect()
+
+        self._global_robot = self._robot_surface
+
+        # self._robot_surface = pygame.image.load(os.environ['TMR_ROOT_DIR'] + "/assets/robot_image.jpg")
+        # self._robot_surface_rect = self._global_robot.get_rect()
+
+        self._robot_sensor_surface = pygame.Surface((200,200))
+        
+        self._robot_sensor_surface.set_colorkey(self._bg_color)
+        
+        self._robot_sensor_surface.set_alpha(128)
+        
+        pygame.draw.circle(self._robot_sensor_surface, self._laser_color, (100,100), 100)
+
+        self._global_robot_sensor_surface = self._robot_sensor_surface
+
+        self.angle = 0
             
-    def key_board_menu_control(self):
+    def key_board_menu_control(self, event):
         """
         Very simple joystick control of the sytem
         the left key can control the left motor and on press the value is incremented
@@ -118,54 +145,52 @@ class World():
         reset to zero.
         """
 
-        for event in pygame.event.get():
+        # print("erer")
 
-            # self._menu.react(event)
+        if event.type == pygame.QUIT:
+            self._done = True
+        
+        if event.type == pygame.KEYDOWN:
 
-            if event.type == pygame.QUIT:
-                self._done = True
-            
-            if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
 
-                if event.key == pygame.K_LEFT:
+                self._pressed_left = True
 
-                    self._pressed_left = True
+            elif event.key == pygame.K_RIGHT:
 
-                elif event.key == pygame.K_RIGHT:
+                self._pressed_right = True
 
-                    self._pressed_right = True
+            elif event.key == pygame.K_UP:
 
-                elif event.key == pygame.K_UP:
+                self._pressed_up = True
 
-                    self._pressed_up = True
+            elif event.key == pygame.K_DOWN:
 
-                elif event.key == pygame.K_DOWN:
+                self._pressed_down = True
 
-                    self._pressed_down = True
+            elif event.key == pygame.K_SPACE:
 
-                elif event.key == pygame.K_SPACE:
+                self._rover.stop()
 
-                    self._rover.stop()
+                self._motor_1_cmd, self._motor_2_cmd = 0, 0
+        
+        if event.type == pygame.KEYUP:
 
-                    self._motor_1_cmd, self._motor_2_cmd = 0, 0
-            
-            if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
 
-                if event.key == pygame.K_LEFT:
+                self._pressed_left = False
 
-                    self._pressed_left = False
+            elif event.key == pygame.K_RIGHT:
 
-                elif event.key == pygame.K_RIGHT:
+                self._pressed_right = False
 
-                    self._pressed_right = False
+            elif event.key == pygame.K_UP:
 
-                elif event.key == pygame.K_UP:
+                self._pressed_up = False
 
-                    self._pressed_up = False
+            elif event.key == pygame.K_DOWN:
 
-                elif event.key == pygame.K_DOWN:
-
-                    self._pressed_down = False
+                self._pressed_down = False
 
         if self._pressed_left:
 
@@ -191,11 +216,11 @@ class World():
 
             self._motor_2_cmd -= self._motor_increment
 
-        if (not self._pressed_left and not self._pressed_up) and (not self._pressed_right and not self._pressed_down):
+        # if (not self._pressed_left and not self._pressed_up) and (not self._pressed_right and not self._pressed_down):
             
-            self._motor_2_cmd = 0
+        #     self._motor_2_cmd = 0
             
-            self._motor_1_cmd = 0
+        #     self._motor_1_cmd = 0
 
 
     def draw_robot(self, s):
@@ -206,30 +231,24 @@ class World():
         x,y,th = s[0], s[1], s[2]
 
         sensed_state = self._rover.sensed_state()
-        # laser_corners = sensed_state['ultrasound']
 
         x_pixel, y_pixel = self.convert_world_to_screen([x], [y])
-        
 
-        # self._robot_sprite.update(x_pixel[0], y_pixel[0], (th/np.pi)*180)
-        # self._robot_sprite.rect.x=x_pixel[0]
-        # self._robot_sprite.rect.y=y_pixel[0]
+        robot_surface = pygame.transform.rotate(self._global_robot, th*(180.0/np.pi)%360)
 
-        rot_mat = self._rover.compute_rot_mat()
+        robot_sensor_surface = pygame.transform.rotate(self._global_robot_sensor_surface, th*(180.0/np.pi)%360)
 
-        fwd_corners = rot_mat.dot(np.array([[0., 1., 1., 0.], 
-                                            [-0.1, -0.1, 0.1, 0.1] ]))
+        new_rect_1 = robot_surface.get_rect(center=(x_pixel[0],y_pixel[0]))
 
-        fwd_x_pixel, fwd_y_pixel = self.convert_world_to_screen(fwd_corners[0,:]+x, fwd_corners[1,:]+y)
+        new_rect_2 = robot_sensor_surface.get_rect(center=(x_pixel[0], y_pixel[0]))
 
+        self._display_screen.blit(robot_surface, new_rect_1)
 
-        pygame.draw.circle(self._display_screen, self._laser_color, [ x_pixel[0], y_pixel[0] ], 150, 0)
+        self._display_screen.blit(robot_sensor_surface, new_rect_2)
 
-        pygame.draw.circle(self._display_screen, self._robot_color, [ x_pixel[0], y_pixel[0] ], 100, 0)
+        self._robot_surface = robot_surface
 
-        pygame.draw.circle(self._display_screen, self._robot_color, [ x_pixel[0], y_pixel[0] ], 100, 0)
-
-        pygame.draw.polygon(self._display_screen, (0,0,255,255), [[l_x, l_y] for l_x, l_y in zip(fwd_x_pixel, fwd_y_pixel) ] , 2)
+        self._robot_sensor_surface = robot_sensor_surface
 
 
     def convert_screen_to_world(self, x_pixel_list, y_pixel_list):
@@ -248,35 +267,44 @@ class World():
         return [int(x*self._ppm) for x in x_list], [int(y*self._ppm)  for y in y_list] #+ self._display_height
 
 
-    def run(self):
+    # def data_send(self, addData_callbackFunc):
 
-        """
-        The main function that runs the
-        demo
-        """
+
+    def run(self, window, plot_data_handle=None):
 
         logging.getLogger().setLevel(logging.INFO)
 
-        while not self._done:
+        for event in pygame.event.get():
 
-            self._display_screen.fill(self._bg_color)
+            if event.type == pygame.QUIT:
 
-            self.key_board_menu_control()
+                return True
 
-            true_state =  self._rover.command_robot([self._motor_2_cmd, self._motor_1_cmd])
-            
-            sensed_state = self._rover.sensed_state()
+            self.key_board_menu_control(event)
 
-            logging.info(sensed_state['time']+'ENCODER READING'+np.array2string(sensed_state['encoder']))
-            
-            logging.info(sensed_state['time']+'ULTRASONIC READING'+np.array2string(sensed_state['ultrasonic']))
+        self._display_screen.fill(self._bg_color)
 
-            self.draw_robot(true_state)
+        true_state =  self._rover.command_robot(np.array([self._motor_2_cmd, self._motor_1_cmd]))
+        
+        sensed_state = self._rover.sensed_state()
 
-            self._all_sprites_list.draw(self._display_screen)
-            
-            pygame.display.flip()
+        # print (sensed_state)
 
-            self._clock.tick(self._fps)
+        # print (self._motor_1_cmd, self._motor_2_cmd)
+
+        # print (sensed_state)
+
+        self.draw_robot(true_state)
+
+        if plot_data_handle is not None:
+            plot_data_handle(sensed_state['Encoder'][0])
+
+        self._all_sprites_list.draw(self._display_screen)
+        
+        pygame.display.flip()
+
+        self._clock.tick(self._fps)
+
+        return False
 
         

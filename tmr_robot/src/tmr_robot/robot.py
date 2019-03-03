@@ -6,7 +6,6 @@ The robot is assumed to get wheel angular velocities as input
 The system takes in the input and create
 """
 
-
 import numpy as np
 from tmr_sensors.utils.utils import rk4_average
 
@@ -32,6 +31,8 @@ class Robot():
         self._wheel_r = config['wheel_r']
 
         self._robot_d = 2*config['robot_r']
+
+        self._wheel_omg_limit = config['wheel_omg_limit']
 
         assert self._wheel_r > 0.
 
@@ -125,7 +126,7 @@ class Robot():
         k1 = [self._dt*i for i in self.kinematics(xv, u)]
 
         self._t += dt
-        self._x = np.asarray(map(rk4_average, zip(self._x, k1, k2, k3, k4)))
+        self._x = np.asarray(list(map(rk4_average, zip(self._x, k1, k2, k3, k4))))
 
 
     def step(self, u):
@@ -133,6 +134,9 @@ class Robot():
         The robot steps through the world for 
         control command u for the given step size
         """
+
+        u[ u > self._wheel_omg_limit ] = self._wheel_omg_limit
+        u[ u < -self._wheel_omg_limit ] = -self._wheel_omg_limit
 
         while self._t <= self._step_size:
 

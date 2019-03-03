@@ -1,29 +1,17 @@
 import datetime
-import numpy as np
-from tmr_robot.robot import Robot
-from tmr_world.config import WORLD_CONFIG
-from tmr_sensors.encoder.encoder import Encoder
-from tmr_robot.config import MOBILE_ROVER_CONFIG
-from tmr_sensors.encoder.config import ENCODER_CONFIG
-from tmr_sensors.ultrasonic.ultrasonic import Ultrasonic
-from tmr_sensors.ultrasonic.config import ULTRASONIC_CONFIG
 
 class Rover():
 
-    def __init__(self):
+    def __init__(self, config):
         """
         The class which combines the robot with the sensors.
         """
 
-        self._robot = Robot(config=MOBILE_ROVER_CONFIG)
+        self._robot = config['robot']
 
         self._robot.init_start(x0=2.0, y0=3.5, alpha0=0.)
 
-        self._encoder = Encoder(robot_interface=self._robot, config=ENCODER_CONFIG)
-
-        ULTRASONIC_CONFIG['obstacle_config'] = WORLD_CONFIG['obstacle_config']
-
-        self._ultra_sonic = Ultrasonic(robot_interface=self._robot, config=ULTRASONIC_CONFIG)
+        self._sensors = config['sensors'] 
 
     def command_robot(self, u):
         """
@@ -33,9 +21,8 @@ class Rover():
 
         true_state = self._robot.step(u)
 
-        self._encoder.update()
-
-        self._ultra_sonic.update()
+        for sensor in self._sensors:
+            sensor.update()
 
         return true_state
 
@@ -51,12 +38,10 @@ class Rover():
         This the key dictionary of values
         It contains the sensor readings of all the sytems in place
         """
+        robot_state = {'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
-        robot_state = {
-        'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'encoder':self._encoder.reading(),
-        'ultrasonic':self._ultra_sonic.reading(),
-        }
+        for sensor in self._sensors:
+            robot_state[sensor.name()]=sensor.reading()
 
         return robot_state
 
