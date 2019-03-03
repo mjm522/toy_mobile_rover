@@ -22,6 +22,7 @@ class Rover():
         true_state = self._robot.step(u)
 
         for sensor in self._sensors:
+
             sensor.update()
 
         return true_state
@@ -41,6 +42,7 @@ class Rover():
         robot_state = {'time':datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
         for sensor in self._sensors:
+            
             robot_state[sensor.name()]=sensor.reading()
 
         return robot_state

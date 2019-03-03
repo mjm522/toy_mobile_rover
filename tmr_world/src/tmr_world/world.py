@@ -3,6 +3,7 @@ import copy
 import pygame
 import logging
 import numpy as np
+from math import fabs
 from tmr_world.sprites import Wall, Agent
 
 
@@ -96,16 +97,38 @@ class World():
 
                 block.rect.y = l[1]
 
-                self._wall_list .add(block)
+                self._wall_list.add(block)
 
                 self._all_sprites_list.add(block)
 
 
+
+    def has_collided_with(self,  mob, player):
+        if mob.rect.right > player.left and \
+           mob.rect.left < player.right and \
+           mob.rect.bottom > player.top and \
+           mob.rect.top < player.bottom:
+               collide = True
+               print("sdfhakdjfalkfjn")
+        # deltay = fabs(rect1.centery - rect2.centery)
+        # deltax = fabs(rect1.centerx - rect2.centerx)
+        # print(deltay < rect2.height and deltax < rect2.width)
+        # return deltay < rect2.height and deltax < rect2.width
+
+    def collision_check(self):
+        return
+
+        for block in self._wall_list:
+            
+            if self.has_collided_with( block, self._robot_surface.get_rect()):
+                
+                new_rect_1 = self._robot_surface.get_rect(center=(self._display_width/2, self._display_height/2))
+                
+                self._display_screen.blit( new_rect_1, self._robot_surface)
+
+
+
     def init_robot(self):
-
-        # self._robot_sprite = Agent(self._robot_color,  70,  55)
-
-        # self._all_sprites_list.add(self._robot_sprite)
 
         self._robot_surface = pygame.Surface((100,100))
         
@@ -115,12 +138,7 @@ class World():
         
         pygame.draw.polygon(self._robot_surface, (0,0,255), [[50,40],[50,60],[100,60],[100,40]], 2)
 
-        # self._robot_surface_rect = self._robot_surface.get_rect()
-
         self._global_robot = self._robot_surface
-
-        # self._robot_surface = pygame.image.load(os.environ['TMR_ROOT_DIR'] + "/assets/robot_image.jpg")
-        # self._robot_surface_rect = self._global_robot.get_rect()
 
         self._robot_sensor_surface = pygame.Surface((200,200))
         
@@ -287,6 +305,8 @@ class World():
         true_state =  self._rover.command_robot(np.array([self._motor_2_cmd, self._motor_1_cmd]))
         
         sensed_state = self._rover.sensed_state()
+
+        self.collision_check()
 
         # print (sensed_state)
 

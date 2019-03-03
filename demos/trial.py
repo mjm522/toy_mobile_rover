@@ -129,9 +129,11 @@ class CustomFigCanvas(FigureCanvas, TimedAnimation):
             l.set_data([], [])
 
     def addData(self, value):
+
         self.addedData.append(value)
 
     def zoomIn(self, value):
+        
         bottom = self.ax1.get_ylim()[0]
         top = self.ax1.get_ylim()[1]
         bottom += value

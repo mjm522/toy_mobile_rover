@@ -78,21 +78,6 @@ class EmbedPlot(FigureCanvas, TimedAnimation):
 
         self._data.append(value)
 
-    # def zoomIn(self, value):
-
-    #     bottom = self._ax1.get_ylim()[0]
-
-    #     top = self._ax1.get_ylim()[1]
-        
-    #     bottom += value
-        
-    #     top -= value
-        
-    #     self._ax1.set_ylim(bottom,top)
-        
-    #     self.draw()
-
-
     def _step(self, *args):
         # Extends the _step() method for the TimedAnimation class.
         try:
