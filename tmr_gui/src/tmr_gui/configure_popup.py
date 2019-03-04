@@ -10,8 +10,11 @@ class ConfigurePopup(QWidget):
         QWidget.__init__(self)
 
         self._parent = parent
-        
-        self._config_vals = self._parent.config_at_idx(idx)
+
+        if idx is None:
+            self._config_vals = self._parent.robot_config()
+        else:
+            self._config_vals = self._parent.config_at_idx(idx)
         
         self._idx = idx
         

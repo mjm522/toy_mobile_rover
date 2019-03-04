@@ -22,17 +22,30 @@ class Robot():
         robot_r = the robot is assumed to be a round robot with a radius
         """
 
-        self._dt = config['dt']
+        self.init_robot(config)
+
+        self._num_wheels=2
+
+        self._num_lasers=1
+
+        self._wheel_omgs = [0]*self._num_wheels
+
+
+    def init_robot(self, config):
+
+        self._config = config
+
+        self._dt = config['params']['dt']
 
         self._t  = 0.
 
-        self._step_size = config['step_size']
+        self._step_size = config['params']['step_size']
 
-        self._wheel_r = config['wheel_r']
+        self._wheel_r = config['params']['wheel_r']
 
-        self._robot_d = 2*config['robot_r']
+        self._robot_d = 2*config['params']['robot_r']
 
-        self._wheel_omg_limit = config['wheel_omg_limit']
+        self._wheel_omg_limit = config['params']['wheel_omg_limit']
 
         assert self._wheel_r > 0.
 
@@ -40,11 +53,10 @@ class Robot():
 
         assert self._step_size >= self._dt
 
-        self._num_wheels=2
+    def config(self):
 
-        self._num_lasers=1
+        return self._config
 
-        self._wheel_omgs = [0]*self._num_wheels
 
     def init_start(self, x0, y0, alpha0, t0=0):
         """

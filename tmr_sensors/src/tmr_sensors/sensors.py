@@ -6,11 +6,18 @@ class Sensors(object):
 
     def __init__(self, robot_interface, config):
 
-        self._config = config
+        self.init_sensor(config)
 
         self._curr_value = None
 
         self._robot = robot_interface
+        
+        self.disable()
+
+
+    def init_sensor(self, config):
+
+        self._config = config
 
         self._name = config['name']
 
@@ -21,8 +28,6 @@ class Sensors(object):
         self._noise_type = config['noise_type']
 
         self._range = config['params']['range']
-        
-        self.disable()
 
 
     @abc.abstractmethod

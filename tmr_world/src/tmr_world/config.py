@@ -16,7 +16,9 @@ MAP_CONFIG={
 
 
 WORLD_CONFIG={
+    'laser_alpha':128,
     'robot_color':(0,155,0,0),
+    'laser_sensor_idx':1,
     'laser_color':(125,125,125,0),
     'screen_height':SCREEN_HEIGHT,
     'screen_width':SCREEN_WIDTH,

@@ -31,8 +31,18 @@ class Rover():
         """
         The utility function to insteneously stop the robot
         """
-
         self._robot.stop()
+
+
+    def update_robot_config(self, robot_config):
+
+        self._robot.init_robot(robot_config)
+
+
+    def update_sensor_config(self, sensor_config, idx):
+
+        self._sensors[idx].init_sensor(sensor_config)
+
 
     def sensed_state(self):
         """

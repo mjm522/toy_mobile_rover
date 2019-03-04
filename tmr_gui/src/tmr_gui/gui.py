@@ -25,6 +25,8 @@ class GUI(QWidget):
         self._height = 540
 
         self._sensor_configs = [sensor.config() for sensor in rover_config['sensors']]
+
+        self._robot_config = rover_world._rover._robot.config()
         
         self.init_ui()
         
@@ -36,11 +38,17 @@ class GUI(QWidget):
         
         self.setGeometry(self._left, self._top, self._width, self._height)
 
-        self._button = QPushButton('Configure', self)
+        self._s_button = QPushButton('Configure Sensors', self)
+
+        self._r_button = QPushButton('Configure Robot', self)
         
-        self._button.move(600, 100)
+        self._s_button.move(540, 100)
         
-        self._button.clicked.connect(self.drop_down)
+        self._r_button.move(550, 200)
+
+        self._s_button.clicked.connect(self.drop_down)
+
+        self._r_button.clicked.connect(partial(self.pop_up, None))
 
         self.init_plot()        
 
@@ -78,30 +86,39 @@ class GUI(QWidget):
 
             self._sensor_list.addItem(sensor['name'])
 
-        self._sensor_list.activated[str].connect(partial(self.pop_up, idx))
+            self._sensor_list.activated[str].connect(partial(self.pop_up, idx))
 
-        self._sensor_list.move(self._width/2, self._height/2)
+        self._sensor_list.move(3*self._width/4, self._height/2)
 
         self._sensor_list.show()
 
     def pop_up(self, sensor_idx):
         
-        self._sensor_config = ConfigurePopup(self, 0)
+        self._sensor_config = ConfigurePopup(self, sensor_idx)
 
         self._sensor_config.move(self._width/2, self._height/2)
 
         self._sensor_config.show()
 
-        self._sensor_list.close()
+        if sensor_idx is not None:
+
+            self._sensor_list.close()
+
+    def robot_config(self):
+        return self._robot_config
 
     def config_at_idx(self, idx):
 
         return self._sensor_configs[idx]
 
     def update_configs(self, vals, idx):
-        # print ("old", self._sensor_configs[idx])
-        self._sensor_configs[idx]['params'].update({k : vals[i] for i,k in enumerate(self._sensor_configs[idx]['params'].keys())})
-        # print ("updated", self._sensor_configs[idx])
+
+        if idx is None:
+            self._robot_config['params'].update({k : vals[i] for i,k in enumerate(self._robot_config['params'].keys())})
+            self._rover_world.update_robot_config(self._robot_config)
+        else:
+            self._sensor_configs[idx]['params'].update({k : vals[i] for i,k in enumerate(self._sensor_configs[idx]['params'].keys())})
+            self._rover_world.update_sensor_config(self._sensor_configs[idx], idx)
      
     def init_pygame(self, rover_world):
         

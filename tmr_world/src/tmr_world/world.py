@@ -19,6 +19,8 @@ class World():
 
         self._laser_color = config['laser_color']
 
+        self._laser_alpha = config['laser_alpha']
+
         self._robot_color = config['robot_color']
 
         self._display_width = config['screen_width']
@@ -26,6 +28,8 @@ class World():
         self._display_height  = config['screen_height']
 
         self._motor_increment = config['motor_increment']
+
+        self._laser_sensor_idx = config['laser_sensor_idx']
 
         self._rover = rover_interface
 
@@ -102,6 +106,17 @@ class World():
                 self._all_sprites_list.add(block)
 
 
+    def update_sensor_config(self, new_sensor_config, idx):
+
+        self._rover.update_sensor_config(new_sensor_config, idx)
+
+        self.init_robot()
+
+    def update_robot_config(self, new_robot_config):
+
+        self._rover.update_robot_config(new_robot_config)
+
+        self.init_robot()
 
     def has_collided_with(self,  mob, player):
         if mob.rect.right > player.left and \
@@ -130,27 +145,32 @@ class World():
 
     def init_robot(self):
 
-        self._robot_surface = pygame.Surface((100,100))
+        robot_radius = int(0.5*self._rover._robot._robot_d*self._ppm)
+
+        laser_radius = int(self._rover._sensors[self._laser_sensor_idx]._range*self._ppm)
+
+        self._robot_surface = pygame.Surface((robot_radius*2,robot_radius*2))
         
         self._robot_surface.set_colorkey(self._bg_color)
         
-        pygame.draw.circle(self._robot_surface, self._robot_color, (50, 50), 50)
+        pygame.draw.circle(self._robot_surface, self._robot_color, (robot_radius, robot_radius), robot_radius)
         
-        pygame.draw.polygon(self._robot_surface, (0,0,255), [[50,40],[50,60],[100,60],[100,40]], 2)
+        pygame.draw.polygon(self._robot_surface, (0,0,255), [[robot_radius,robot_radius-10],\
+                                                             [robot_radius,robot_radius+10],\
+                                                             [2*robot_radius,robot_radius+10],\
+                                                             [2*robot_radius,robot_radius-10]], 2)
 
         self._global_robot = self._robot_surface
 
-        self._robot_sensor_surface = pygame.Surface((200,200))
+        self._robot_sensor_surface = pygame.Surface((laser_radius*2,laser_radius*2))
         
         self._robot_sensor_surface.set_colorkey(self._bg_color)
         
-        self._robot_sensor_surface.set_alpha(128)
+        self._robot_sensor_surface.set_alpha(self._laser_alpha)
         
-        pygame.draw.circle(self._robot_sensor_surface, self._laser_color, (100,100), 100)
+        pygame.draw.circle(self._robot_sensor_surface, self._laser_color, (laser_radius, laser_radius), laser_radius)
 
         self._global_robot_sensor_surface = self._robot_sensor_surface
-
-        self.angle = 0
             
     def key_board_menu_control(self, event):
         """
