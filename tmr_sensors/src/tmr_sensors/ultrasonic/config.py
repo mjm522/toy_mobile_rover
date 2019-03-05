@@ -13,4 +13,5 @@ ULTRASONIC_CONFIG={
     'params':PARAMS,
     'val_dim':None,
     'plotable_vals':None,
+    'obstacle_config':None,
 }

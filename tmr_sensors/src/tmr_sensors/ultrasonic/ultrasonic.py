@@ -46,17 +46,19 @@ class Ultrasonic(Sensors):
 
         self.enable()
 
-        self._obs_config = config['obstacle_config']
-
         self._robot = robot_interface
 
-        if 'obstacles_start' in self._obs_config and 'obstacles_end' in self._obs_config:
+        if config['obstacle_config'] is not None:
 
-            self._obstacle_lines_starts = self._obs_config['obstacles_start']
+            self._obs_config = config['obstacle_config']
 
-            self._obstacle_lines_ends = self._obs_config['obstacles_end']
+            if 'obstacles_start' in self._obs_config and 'obstacles_end' in self._obs_config:
 
-        assert len(self._obstacle_lines_starts) == len(self._obstacle_lines_ends)
+                self._obstacle_lines_starts = self._obs_config['obstacles_start']
+
+                self._obstacle_lines_ends = self._obs_config['obstacles_end']
+
+            assert len(self._obstacle_lines_starts) == len(self._obstacle_lines_ends)
 
 
     def update(self):
