@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication
 from tmr_world.config import WORLD_CONFIG
 from tmr_rover.config import ROVER_CONFIG
 
-
+np.random.seed(123)
 
 def main():
     
@@ -19,7 +19,7 @@ def main():
     
     result = app.exec_()
 
-    print("GUI finished: " + str(result))
+    print("TMR rover demo finished: " + str(result))
     
     sys.exit(result)
 

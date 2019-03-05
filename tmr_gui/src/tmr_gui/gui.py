@@ -33,10 +33,10 @@ import sys, time
 import threading
 from functools import partial
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtCore import QTimer, QRect
+from PyQt5.QtCore import QTimer, QRect, Qt
 from tmr_gui.configure_popup import ConfigurePopup
 from tmr_gui.embed_plot import EmbedPlot, Communicate
-from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QFrame, QGridLayout, QLabel, QMessageBox
+from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QFrame, QGridLayout, QLabel, QMessageBox, QCheckBox
 
 
 class GUI(QWidget):
@@ -98,6 +98,20 @@ class GUI(QWidget):
         self._r_button.clicked.connect(partial(self.pop_edit_up, None))
 
         self._v_button.clicked.connect(partial(self.drop_down, 'check'))
+
+        self._move_check_box = QCheckBox("Self Move", self)
+
+        self._log_check_box = QCheckBox("Print Log", self)
+
+        self._log_check_box.move(550, 400)
+
+        self._move_check_box.move(550, 450)
+
+        self._move_check_box.setChecked(True)
+
+        self._log_check_box.stateChanged.connect(self.update_log_status)
+
+        self._move_check_box.stateChanged.connect(self.update_move_status)
 
         self.init_plot()   
 
@@ -165,6 +179,7 @@ class GUI(QWidget):
         msg.setWindowTitle("nfo")
         
         msg.setDetailedText("The robot can be controlled by moving the system using arrow keys.\
+            For this the Move Own check box on the gui should be turned off.\
             Make sure to press the keys intermittently. This is to enable constant movement without keyboard.\
             The sensor and the robot configuration can be changed via the configure buttons. The sensors available \
             for visualisation can be accessed via the visualise button. Only one parameter can be visualised per time.")
@@ -282,10 +297,15 @@ class GUI(QWidget):
         """
 
         if idx is None:
+            
             self._robot_config['params'].update({k : vals[i] for i,k in enumerate(self._robot_config['params'].keys())})
+            
             self._rover_world.update_robot_config(self._robot_config)
+        
         else:
+            
             self._sensor_configs[idx]['params'].update({k : vals[i] for i,k in enumerate(self._sensor_configs[idx]['params'].keys())})
+            
             self._rover_world.update_sensor_config(self._sensor_configs[idx], idx)
 
 
@@ -301,6 +321,38 @@ class GUI(QWidget):
         self._plot_status[idx] = vals
 
         self._plot_defualt_idx = idx
+
+    def update_log_status(self, state):
+        """
+        Callback function from the check box in the panel.
+        The input is the state of the q box. Based on the status
+        the log will be either shown or turned off.
+        """
+
+        if state == Qt.Checked:
+
+            self._rover_world.show_log(True)
+
+        else:
+
+            self._rover_world.show_log(False)
+
+
+    def update_move_status(self, state):
+        """
+        Callback function from the check box in the panel.
+        The input is the state of the q box. Based on the status
+        the log will be either shown or turned off.
+        """
+
+        if state == Qt.Checked:
+
+            self._rover_world.move_own(True)
+
+        else:
+
+            self._rover_world.move_own(False)
+
 
      
     def init_pygame(self, rover_world):

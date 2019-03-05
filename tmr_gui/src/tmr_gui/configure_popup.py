@@ -49,7 +49,7 @@ class ConfigurePopup(QWidget):
 
         self._parent = parent
 
-        if form =='edit' and idx is not None:
+        if form =='edit':
 
             self.init_edit_layout(idx)
 
@@ -202,7 +202,7 @@ class ConfigurePopup(QWidget):
                 
                 self._chk_vals[idx] = False
 
-            self._parent.update_plots(self._chk_vals, self._idx)
+            self._parent.update_plots(self._chk_vals, idx)
 
     def config_vals(self):
         """
