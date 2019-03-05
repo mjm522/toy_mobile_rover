@@ -183,8 +183,6 @@ class World():
         reset to zero.
         """
 
-        # print("erer")
-
         if event.type == pygame.QUIT:
             self._done = True
         
@@ -337,7 +335,7 @@ class World():
         self.draw_robot(true_state)
 
         if plot_data_handle is not None:
-            plot_data_handle(sensed_state['Encoder'][0])
+            plot_data_handle(sensed_state['Encoder'])
 
         self._all_sprites_list.draw(self._display_screen)
         

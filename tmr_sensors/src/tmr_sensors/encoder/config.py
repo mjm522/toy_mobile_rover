@@ -10,4 +10,6 @@ ENCODER_CONFIG={
     'name':'Encoder',
     'noise_type':'random',
     'params':PARAMS,
+    'val_dim':2,
+    'plotable_vals':{'left_wheel':0, 'right_wheel':1},
 }

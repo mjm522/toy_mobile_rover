@@ -4,7 +4,6 @@ PARAMS = {
     'res':0.001, #
     'noise_gain':0.001, #noise gain
     'range':2,
-    'beam_radius':MOBILE_ROVER_CONFIG['params']['robot_r']*2.,
 }
 
 ULTRASONIC_CONFIG={
@@ -12,4 +11,6 @@ ULTRASONIC_CONFIG={
     'noise_type':'random',
     'map_config':None,
     'params':PARAMS,
+    'val_dim':None,
+    'plotable_vals':None,
 }

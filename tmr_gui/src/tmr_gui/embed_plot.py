@@ -1,3 +1,31 @@
+#!/usr/bin/env python3
+"""Provides GUI which creates the plot panel pop up for the tmr robot.
+
+Copyright (C) 2019 Michael J Mathew
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
+__author__     = "Michael J Mathew"
+__copyright__  = "Copyright 2019, The Ascent Project"
+__license__    = "GNU"
+__version__    = "0.0.0"
+__maintainer__ = "Michael J Mathew"
+__email__      = "mjm522@student.bham.ac.uk"
+__status__     = "Development"
+
 import sys
 import matplotlib
 import numpy as np
@@ -14,6 +42,11 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 class EmbedPlot(FigureCanvas, TimedAnimation):
 
     def __init__(self, maxlen=20):
+        """
+        Class contstructor
+        Param: maxlen: number of values in the plot
+        window. This helps to avoid resizing of the window
+        """
 
         self._data = deque(maxlen=maxlen)
 
@@ -63,10 +96,16 @@ class EmbedPlot(FigureCanvas, TimedAnimation):
 
 
     def new_frame_seq(self):
+        """
+        Create new frame sequence
+        """
 
         return iter(range(self._n.size))
 
     def _init_draw(self):
+        """
+        Set the axis lines
+        """
 
         lines = [self._line1, self._line1_tail, self._line1_head]
         
@@ -75,20 +114,32 @@ class EmbedPlot(FigureCanvas, TimedAnimation):
             l.set_data([], [])
 
     def add_data(self, value):
+        """
+        Add data to the data list
+        """
 
         self._data.append(value)
 
     def _step(self, *args):
-        # Extends the _step() method for the TimedAnimation class.
+        """
+        Step through the animation
+        or plot
+        """
+       
         try:
+
             TimedAnimation._step(self, *args)
+
         except Exception as e:
-            # self.abc += 1
-            # print(str(self.abc))
+
             TimedAnimation._stop(self)
+
             pass
 
     def _draw_frame(self, framedata):
+        """
+        Draw the frame of the robot
+        """
         
         margin = 2
         
@@ -111,5 +162,10 @@ class EmbedPlot(FigureCanvas, TimedAnimation):
 
 
 class Communicate(QObject):
+    """
+    This class is for creating
+    a real time streaming class of data
+    to the plot window. 
+    """
 
     data_signal = pyqtSignal(float)
