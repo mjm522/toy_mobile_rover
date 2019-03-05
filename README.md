@@ -75,25 +75,37 @@ This is the file which is the demo>demo_rover_world.py
 
 ## 5 Setup instructions (Tested with Python 3.5 on Ubuntu 16.04)
 
-    Run $./install_dependencies.sh
+Ideally it is recommended to create a virtual environment to test this system. Make sure to create one using Python3. It can be done as follows. It is assumed you have installed virutalenvironment wrapper.
+
+    $ which python3 #Output: /usr/bin/python3
+
+    $ mkvirtualenv --python=/usr/bin/python3 nameOfEnvironment
+
+Clone the github repository to a suitable location
+
+    $ git clone https://github.com/mjm522/toy_mobile_rover
+
+
+Setup the dependencies. For that, run following in the terminal
+
+    $ ./install_dependencies.sh
 
    Now we need to setup the PYTHONPATH. The modules of the library can be installed, but for the testing, just source the following file.
 
-    $source setup_tmr.bash
+    $ source setup_tmr.bash
 
    Check the demo by running,
      
-    python demos/demo_rover.world.py
+    $ python demos/demo_rover.world.py
 
 The mobile rover seen can be controlled using the arrow keys once the pygame window is selected. At present, two sensors are implemented, scaling this platform up is quite trivial. To change parameters of the sensors, change values by clicking the GUI button sensor config
-
-    The gui has been written in a way to scale arbitarily to any number of sensors.
+The gui has been written in a way to scale arbitarily to any number of sensors.
 
 ### 6 Optional steps
 
-   To generate documentation of the library install doxygen by type in 
+To generate documentation of the library install doxygen by type in 
     
-    doxygen doxygen_config_file
+    $ doxygen doxygen_config_file
 
 ### 7 To Fix 
 
