@@ -14,4 +14,5 @@ ULTRASONIC_CONFIG={
     'val_dim':None,
     'plotable_vals':None,
     'obstacle_config':None,
+    'precision':3,
 }

@@ -12,4 +12,5 @@ ENCODER_CONFIG={
     'params':PARAMS,
     'val_dim':2,
     'plotable_vals':{'left_wheel':0, 'right_wheel':1},
+    'precision':3,
 }

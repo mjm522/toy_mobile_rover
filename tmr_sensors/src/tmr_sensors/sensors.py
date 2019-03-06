@@ -28,6 +28,7 @@ __email__      = "mjm522@student.bham.ac.uk"
 __status__     = "Development"
 
 import abc
+import numpy as np
 
 class Sensors(object):
 
@@ -62,6 +63,8 @@ class Sensors(object):
 
         self._plotable_vals = config['plotable_vals']
 
+        self._precision = config['precision']
+
 
     @abc.abstractmethod
     def update(self):
@@ -88,7 +91,7 @@ class Sensors(object):
 
     def reading(self):
 
-        return self._curr_value
+        return np.round(self._curr_value, self._precision)
 
     def enable(self):
 

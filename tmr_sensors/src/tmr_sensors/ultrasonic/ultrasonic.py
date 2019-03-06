@@ -90,7 +90,7 @@ class Ultrasonic(Sensors):
 
             else:
 
-                return np.nan
+                return self.noise()
 
         if self._is_active:
         
@@ -100,7 +100,7 @@ class Ultrasonic(Sensors):
 
                 dists.append(detect_obstacle(s, e))
 
-            self._curr_value = np.array(dists)
+            self._curr_value = np.array(dists).squeeze()
         
 
     def reset(self):
