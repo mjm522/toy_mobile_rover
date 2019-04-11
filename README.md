@@ -1,5 +1,5 @@
 
-# ASCENT Robotics - Code Asignment - Sensor System
+# Sensor System - A Toy System
 
 In this project you will be implementing a (very simple) simulated sensor system. You will need to come up with a few different types of sensors, create a prototype of them and build a system using them.
 
